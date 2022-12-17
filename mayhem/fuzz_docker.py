@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
 import atheris
-import io
 import sys
-import tempfile
+import fuzz_helpers
 
-with atheris.instrument_imports():
-    from dockerfile_parse import DockerfileParser
+with atheris.instrument_imports(enable_loader_override=False):
+    import dockerfile_parse
 
-@atheris.instrument_func
 def TestOneInput(data):
-        f = tempfile.NamedTemporaryFile()
-        f.write(data)
-        f.flush()
-        DockerfileParser(f.name)
+        fdp = fuzz_helpers.EnhancedFuzzedDataProvider(data)
+        with fdp.ConsumeMemoryStringFile(all_data=True) as f:
+            dfile = dockerfile_parse.DockerfileParser(fileobj=f)
+            for struct in dfile.structure:
+                pass
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
@@ -21,4 +20,5 @@ def main():
 
 
 if __name__ == "__main__":
+    atheris.instrument_all()
     main()
