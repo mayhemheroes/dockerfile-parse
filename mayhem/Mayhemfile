@@ -1,0 +1,9 @@
+project: dockerfile-parse
+target: docker-parse
+testsuite:
+    - file://mayhem/testsuite
+
+cmds:
+  - cmd: /src/mayhem/fuzz_docker.py
+    libfuzzer: true
+    timeout: 12
